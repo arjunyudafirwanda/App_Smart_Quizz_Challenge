@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Smart Quiz Challenge — permainan kuis edukasi coding untuk anak SD. Belajar Scratch, algoritma, urutan instruksi, event, loop, dan logika dengan cara menyenangkan."
+    />
+    <meta name="author" content="Arjun Yuda Firwanda" />
+    <meta name="theme-color" content="#142342" />
+    <title>Smart Quiz Challenge | Think. Choose. Level Up!</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      // Smart Quiz Challenge tidak menggunakan database atau penyimpanan browser.
+      // Nama pemain, level, dan skor dimulai ulang setiap kali halaman dimuat ulang.
+    </script>
+  </head>
+
+  <body>
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <header class="site-header" id="siteHeader">
+      <div class="header-main container">
+        <a
+          class="brand"
+          href="#home"
+          aria-label="Smart Quiz Challenge - Beranda"
+        >
+          <img
+            src="assets/images/logo.svg"
+            alt="Logo Smart Quiz Challenge"
+            class="brand-logo"
+          />
+          <span class="brand-copy">
+            <strong>SMART QUIZ <span>CHALLENGE</span></strong>
+            <small>THINK · CHOOSE · LEVEL UP</small>
+          </span>
+        </a>
+
+        <nav class="main-nav" aria-label="Navigasi utama">
+          <a class="nav-link active" href="#home">Beranda</a>
+          <a class="nav-link" href="#challengeSection">Tantangan</a>
+          <a class="nav-link" href="#guideSection">Panduan</a>
+        </nav>
+
+        <div class="header-stats">
+          <div class="header-stat player-stat">
+            <span class="stat-icon">👋</span>
+            <span class="stat-copy"
+              ><small>PEMAIN</small
+              ><strong id="headerPlayer">Tamu</strong></span
+            >
+          </div>
+          <div class="header-stat level-stat">
+            <span class="stat-icon">🎯</span>
+            <span class="stat-copy"
+              ><small>LEVEL</small
+              ><strong id="levelNumber">0 / 20</strong></span
+            >
+          </div>
+          <div class="header-stat score-stat">
+            <span class="stat-icon">⭐</span>
+            <span class="stat-copy"
+              ><small>SKOR</small><strong id="totalScore">0</strong></span
+            >
+          </div>
+        </div>
+
+        <button
+          class="mobile-nav-toggle"
+          id="mobileNavToggle"
+          type="button"
+          aria-label="Buka navigasi"
+          aria-expanded="false"
+        >
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="mobile-nav" id="mobileNav">
+        <a class="nav-link active" href="#home">🏠 Beranda</a>
+        <a class="nav-link" href="#challengeSection">🧠 Tantangan</a>
+        <a class="nav-link" href="#guideSection">📘 Panduan</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-section" id="home">
+        <div class="hero-grid container">
+          <div class="hero-copy reveal">
+            <div class="eyebrow">
+              <span class="eyebrow-dot"></span> CODING & COMPUTATIONAL THINKING
+              FOR KIDS
+            </div>
+            <h1>Think smart.<br /><span>Play smarter.</span></h1>
+            <p class="hero-description">
+              Asah logika, kenali dasar pemrograman, dan pecahkan tantangan
+              coding melalui kuis interaktif yang seru. Satu jawaban benar
+              membawamu selangkah lebih dekat menjadi
+              <strong>Junior Coding Champion!</strong>
+            </p>
+            <div class="hero-pills">
+              <span>🧩 Belajar sambil bermain</span>
+              <span>🚀 20 level tantangan</span>
+              <span>⭐ Kumpulkan poin</span>
+            </div>
+            <a
+              class="button button-primary hero-cta"
+              href="#playerSetup"
+              id="heroStartLink"
+              >Mulai Petualangan <span>↗</span></a
+            >
+            <div class="hero-caption">
+              <span class="caption-line"></span> A FUN WAY TO LEARN THE LOGIC OF
+              CODE
+            </div>
+          </div>
+
+          <div
+            class="hero-art reveal reveal-delay"
+            aria-label="Maskot robot Smart Quiz Challenge"
+          >
+            <div class="art-orbit orbit-one"></div>
+            <div class="art-orbit orbit-two"></div>
+            <div class="floating-chip chip-top">&lt;/&gt;</div>
+            <div class="floating-chip chip-side">0101</div>
+            <img
+              src="assets/images/quiz-mascot.svg"
+              alt="Qubi, maskot robot Smart Quiz Challenge"
+              class="hero-mascot"
+            />
+            <div class="hero-art-label">
+              <span class="mini-sparkle">✦</span
+              ><span
+                ><strong>Meet Qubi!</strong><small>Your quiz buddy</small></span
+              >
+            </div>
+          </div>
+        </div>
+        <div class="hero-bottom container">
+          <span>01 / LEARN</span><span class="hero-bottom-line"></span
+          ><span>02 / THINK</span><span class="hero-bottom-line"></span
+          ><span>03 / ACHIEVE</span>
+        </div>
+      </section>
+
+      <section class="challenge-section section-space" id="challengeSection">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="section-kicker">YOUR CODING JOURNEY</span>
+            <h2>Ready for the <span>Challenge?</span></h2>
+            <p>
+              Kenalkan dirimu terlebih dahulu, lalu mulai perjalanan menjawab 20
+              tantangan coding.
+            </p>
+          </div>
+
+          <section
+            class="player-setup panel reveal"
+            id="playerSetup"
+            aria-labelledby="setupTitle"
+          >
+            <div class="setup-art">
+              <img
+                src="assets/images/quiz-welcome.svg"
+                alt="Ilustrasi laptop, puzzle coding, dan bintang"
+              />
+            </div>
+            <div class="setup-content">
+              <span class="section-kicker">PLAYER REGISTRATION</span>
+              <h3 id="setupTitle">
+                Siapa nama <span>jagoan coding</span> hari ini?
+              </h3>
+              <p>
+                Masukkan nama lengkap untuk memulai tantangan. Nama hanya
+                digunakan selama sesi bermain dan tidak dikirim atau disimpan ke
+                database.
+              </p>
+              <form id="playerForm" novalidate>
+                <label for="playerName">Nama lengkap</label>
+                <div class="name-input-wrap">
+                  <span aria-hidden="true">👤</span>
+                  <input
+                    id="playerName"
+                    name="playerName"
+                    type="text"
+                    autocomplete="name"
+                    maxlength="60"
+                    placeholder="Contoh: Alya Putri Ramadhani"
+                    required
+                  />
+                </div>
+                <p class="form-hint">Gunakan minimal dua kata, ya.</p>
+                <p class="form-error" id="nameError" role="alert"></p>
+                <button class="button button-primary button-wide" type="submit">
+                  Mulai Tantangan <span>→</span>
+                </button>
+              </form>
+              <div class="privacy-note">
+                <span>🔒</span> Tanpa akun, tanpa database. Refresh halaman akan
+                mengulang level dan skor dari awal.
+              </div>
+            </div>
+          </section>
+
+          <section
+            class="quiz-layout hidden"
+            id="quizPanel"
+            aria-label="Area kuis Smart Quiz Challenge"
+          >
+            <div class="quiz-main-column">
+              <div class="quiz-board panel" id="quizBoard" tabindex="-1">
+                <div class="quiz-board-top">
+                  <div>
+                    <span class="section-kicker">SMART QUIZ ARENA</span>
+                    <h3>
+                      Let's solve it, <span id="quizPlayerName">Champion</span>!
+                    </h3>
+                  </div>
+                  <button
+                    class="text-button"
+                    id="changePlayerBtn"
+                    type="button"
+                  >
+                    Ganti pemain ↗
+                  </button>
+                </div>
+
+                <div class="question-progress-wrap">
+                  <div class="question-progress-label">
+                    <span id="questionProgressText">LEVEL 01 OF 20</span
+                    ><strong id="questionProgressPercent">5%</strong>
+                  </div>
+                  <div class="progress-track">
+                    <span id="questionProgressBar"></span>
+                  </div>
+                </div>
+
+                <div class="question-meta">
+                  <span class="topic-tag" id="questionCategory"
+                    >BASIC CODING</span
+                  >
+                  <span class="difficulty-tag" id="questionDifficulty"
+                    >EASY</span
+                  >
+                  <span class="points-tag">+100 PTS</span>
+                </div>
+
+                <div class="question-content">
+                  <div
+                    class="question-illustration"
+                    id="questionIllustration"
+                    aria-hidden="true"
+                  >
+                    🧩
+                  </div>
+                  <div class="question-text-wrap">
+                    <span class="question-overline"
+                      >CHALLENGE <span id="questionNumber">01</span></span
+                    >
+                    <h4 id="questionText">
+                      Apa yang dimaksud dengan urutan instruksi dalam
+                      pemrograman?
+                    </h4>
+                    <p id="questionPrompt">
+                      Pilih satu jawaban yang paling tepat.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  class="answer-grid"
+                  id="answerGrid"
+                  aria-label="Pilihan jawaban"
+                ></div>
+
+                <div
+                  class="answer-feedback"
+                  id="answerFeedback"
+                  role="status"
+                  aria-live="polite"
+                  hidden
+                >
+                  <div class="feedback-symbol" id="feedbackSymbol">✨</div>
+                  <div class="feedback-copy">
+                    <strong id="feedbackTitle">Bagus!</strong>
+                    <p id="feedbackText"></p>
+                  </div>
+                </div>
+
+                <div class="quiz-board-actions">
+                  <span class="attempt-note" id="attemptNote"
+                    >Pilih jawabanmu dengan teliti.</span
+                  >
+                  <button
+                    class="button button-primary"
+                    id="nextQuestionBtn"
+                    type="button"
+                    disabled
+                  >
+                    Soal Berikutnya <span>→</span>
+                  </button>
+                </div>
+              </div>
+
+              <div
+                class="result-panel panel hidden"
+                id="resultPanel"
+                aria-live="polite"
+              >
+                <div class="result-confetti">✦　✧　✦</div>
+                <img
+                  src="assets/images/quiz-trophy.svg"
+                  alt="Piala juara Smart Quiz"
+                  class="result-trophy"
+                />
+                <span class="section-kicker">CHALLENGE COMPLETED</span>
+                <h3>
+                  Outstanding work, <span id="resultPlayerName">Champion</span>!
+                </h3>
+                <p class="result-description">
+                  Kamu sudah menyelesaikan seluruh 20 tantangan Smart Quiz
+                  Challenge. Terus belajar dan jadilah pemikir yang hebat!
+                </p>
+                <div class="result-stats">
+                  <div>
+                    <strong id="finalScore">0</strong><span>TOTAL POIN</span>
+                  </div>
+                  <div>
+                    <strong id="finalCorrect">0 / 20</strong
+                    ><span>JAWABAN BENAR</span>
+                  </div>
+                  <div>
+                    <strong id="finalAccuracy">0%</strong><span>AKURASI</span>
+                  </div>
+                </div>
+                <div class="result-actions">
+                  <button
+                    class="button button-primary"
+                    id="playAgainBtn"
+                    type="button"
+                  >
+                    Main Lagi <span>↻</span>
+                  </button>
+                  <button
+                    class="button button-outline"
+                    id="newPlayerBtn"
+                    type="button"
+                  >
+                    Ganti Pemain
+                  </button>
+                </div>
+                <p class="session-note">
+                  Hasil ini hanya tersedia selama sesi browser saat ini. Refresh
+                  halaman akan memulai sesi baru.
+                </p>
+              </div>
+            </div>
+
+            <aside class="quiz-sidebar">
+              <div class="player-card panel">
+                <div class="player-avatar">🧑‍💻</div>
+                <div class="player-card-copy">
+                  <small>CODING CHAMPION</small
+                  ><strong id="sidebarPlayerName">Pemain</strong
+                  ><span id="streakText">Ayo mulai tantanganmu!</span>
+                </div>
+              </div>
+
+              <div class="score-card panel">
+                <div class="sidebar-card-heading">
+                  <span>🏆</span>
+                  <div>
+                    <strong>Perolehan Skor</strong
+                    ><small>Skor sesi bermain</small>
+                  </div>
+                </div>
+                <div class="score-number">
+                  <strong id="sidebarScore">0</strong><span>PTS</span>
+                </div>
+                <div class="score-divider"></div>
+                <div class="score-detail">
+                  <span>Jawaban benar</span
+                  ><strong id="correctCount">0 / 20</strong>
+                </div>
+                <div class="score-detail">
+                  <span>Bonus streak</span
+                  ><strong id="bonusScore">0 PTS</strong>
+                </div>
+              </div>
+
+              <div class="level-map panel">
+                <div class="sidebar-card-heading">
+                  <span>🗺️</span>
+                  <div>
+                    <strong>Peta Tantangan</strong
+                    ><small>20 level perjalananmu</small>
+                  </div>
+                </div>
+                <div
+                  class="level-dots"
+                  id="levelDots"
+                  aria-label="Peta 20 level"
+                ></div>
+                <div class="map-legend">
+                  <span><i class="dot-complete"></i> Selesai</span
+                  ><span><i class="dot-current"></i> Aktif</span
+                  ><span><i class="dot-locked"></i> Berikutnya</span>
+                </div>
+              </div>
+
+              <div class="tip-card">
+                <span>💡</span>
+                <div>
+                  <strong>Tips dari Qubi</strong>
+                  <p>
+                    Baca pertanyaan sampai selesai. Pahami masalahnya, lalu
+                    pilih jawaban yang paling sesuai.
+                  </p>
+                </div>
+              </div>
+            </aside>
+          </section>
+        </div>
+      </section>
+
+      <section class="guide-section section-space" id="guideSection">
+        <div class="container">
+          <div class="section-heading reveal">
+            <span class="section-kicker">LEARN THE BASICS</span>
+            <h2>Kenali Dunia <span>Coding!</span></h2>
+            <p>
+              Beberapa konsep dasar yang akan kamu temui sepanjang perjalanan
+              Smart Quiz Challenge.
+            </p>
+          </div>
+          <div class="concept-grid">
+            <article class="concept-card reveal">
+              <div class="concept-icon icon-sequence">
+                <img src="assets/images/icon-sequence.svg" alt="" />
+              </div>
+              <span class="concept-number">01</span>
+              <h3>Sequencing</h3>
+              <p>
+                Menyusun langkah atau instruksi secara berurutan agar program
+                berjalan sesuai tujuan.
+              </p>
+            </article>
+            <article class="concept-card reveal reveal-delay-1">
+              <div class="concept-icon icon-events">
+                <img src="assets/images/icon-events.svg" alt="" />
+              </div>
+              <span class="concept-number">02</span>
+              <h3>Events</h3>
+              <p>
+                Memahami peristiwa yang membuat sebuah program mulai menjalankan
+                perintah.
+              </p>
+            </article>
+            <article class="concept-card reveal reveal-delay-2">
+              <div class="concept-icon icon-loops">
+                <img src="assets/images/icon-loops.svg" alt="" />
+              </div>
+              <span class="concept-number">03</span>
+              <h3>Loops</h3>
+              <p>
+                Menggunakan pengulangan agar instruksi yang sama dapat
+                dijalankan beberapa kali.
+              </p>
+            </article>
+            <article class="concept-card reveal reveal-delay-3">
+              <div class="concept-icon icon-conditions">
+                <img src="assets/images/icon-conditions.svg" alt="" />
+              </div>
+              <span class="concept-number">04</span>
+              <h3>Conditions</h3>
+              <p>
+                Menggunakan kondisi untuk menentukan tindakan yang dilakukan
+                program.
+              </p>
+            </article>
+          </div>
+
+          <div class="how-to-play panel reveal">
+            <div class="how-to-copy">
+              <span class="section-kicker">HOW TO PLAY</span>
+              <h3>Empat langkah menjadi <span>Quiz Champion.</span></h3>
+              <p>
+                Kerjakan tantangan secara bertahap. Setiap jawaban benar akan
+                membuka soal berikutnya dan menambah poinmu.
+              </p>
+            </div>
+            <div class="how-steps">
+              <div class="how-step">
+                <span>1</span>
+                <div>
+                  <strong>Isi nama lengkap</strong
+                  ><small>Kenalkan dirimu sebelum bermain.</small>
+                </div>
+              </div>
+              <div class="how-step">
+                <span>2</span>
+                <div>
+                  <strong>Baca pertanyaan</strong
+                  ><small>Perhatikan topik dan pilihan jawaban.</small>
+                </div>
+              </div>
+              <div class="how-step">
+                <span>3</span>
+                <div>
+                  <strong>Pilih jawaban</strong
+                  ><small>Jawaban benar mendapatkan poin.</small>
+                </div>
+              </div>
+              <div class="how-step">
+                <span>4</span>
+                <div>
+                  <strong>Naik level</strong
+                  ><small>Selesaikan 20 tantangan sampai akhir.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-main">
+        <a href="#home" class="footer-brand"
+          ><img src="assets/images/logo.svg" alt="" /><span
+            ><strong>SMART QUIZ CHALLENGE</strong
+            ><small>Think. Choose. Level Up!</small></span
+          ></a
+        >
+        <p>
+          Media pembelajaran coding interaktif untuk mengasah logika dan
+          computational thinking anak.
+        </p>
+        <a href="#home" class="back-top">Kembali ke atas ↑</a>
+      </div>
+      <div class="footer-bottom">
+        <div class="container">
+          <span
+            >Smart Quiz Challenge © <span id="currentYear"></span> | Arjun Yuda
+            Firwanda. All rights reserved.</span
+          ><span>LEARN · THINK · CREATE</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

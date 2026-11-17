@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420" role="img" aria-labelledby="title desc">
+  <title id="title">Qubi, quiz buddy</title><desc id="desc">Friendly blue and teal robot mascot holding a quiz card.</desc>
+  <defs>
+    <linearGradient id="body" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#82a8ff"/><stop offset="1" stop-color="#4f6ed7"/></linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffffff"/><stop offset="1" stop-color="#eaf4ff"/></linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="17" stdDeviation="12" flood-color="#081a3e" flood-opacity=".24"/></filter>
+  </defs>
+  <ellipse cx="210" cy="372" rx="127" ry="20" fill="#061b3d" opacity=".22"/>
+  <g filter="url(#shadow)">
+    <path d="M210 54v28" stroke="#ffcf61" stroke-width="9" stroke-linecap="round"/><circle cx="210" cy="45" r="13" fill="#ffcf61" stroke="#fff" stroke-width="4"/>
+    <rect x="91" y="91" width="238" height="213" rx="69" fill="url(#body)" stroke="#d6e3ff" stroke-width="7"/>
+    <rect x="116" y="119" width="188" height="143" rx="46" fill="url(#face)"/>
+    <circle cx="170" cy="181" r="16" fill="#4770d9"/><circle cx="252" cy="181" r="16" fill="#4770d9"/>
+    <circle cx="175" cy="175" r="5" fill="#fff"/><circle cx="257" cy="175" r="5" fill="#fff"/>
+    <path d="M174 218q38 33 76 0" fill="none" stroke="#39b79b" stroke-width="10" stroke-linecap="round"/>
+    <rect x="69" y="164" width="31" height="71" rx="14" fill="#ffcf61"/><rect x="320" y="164" width="31" height="71" rx="14" fill="#ffcf61"/>
+    <path d="M144 304v38q0 14 14 14h21q14 0 14-14v-24M227 328v14q0 14 14 14h21q14 0 14-14v-38" fill="none" stroke="#6e8be7" stroke-width="18" stroke-linecap="round"/>
+    <path d="M110 285q-29 28-8 48 17 15 36-2" fill="none" stroke="#7391ed" stroke-width="17" stroke-linecap="round"/>
+    <path d="M313 283q34 20 19 45-12 20-34 6" fill="none" stroke="#7391ed" stroke-width="17" stroke-linecap="round"/>
+    <g transform="translate(262 265) rotate(9)">
+      <rect x="0" y="0" width="104" height="84" rx="14" fill="#fff" stroke="#ffd46e" stroke-width="6"/>
+      <rect x="16" y="17" width="54" height="8" rx="4" fill="#a9c2ff"/>
+      <rect x="16" y="34" width="70" height="7" rx="3.5" fill="#d5e1f7"/>
+      <rect x="16" y="49" width="40" height="7" rx="3.5" fill="#d5e1f7"/>
+      <path d="M72 60l9 9 16-21" fill="none" stroke="#36b995" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+  <path d="M53 102l7 14 15 7-15 7-7 14-7-14-15-7 15-7z" fill="#ffd36b"/><path d="M350 74l5 10 11 5-11 5-5 10-5-10-11-5 11-5z" fill="#8de0ce"/>
+  <circle cx="65" cy="285" r="8" fill="#8de0ce"/><circle cx="359" cy="224" r="7" fill="#ffd36b"/>
+</svg>
