@@ -1948,8 +1948,4 @@ img {
       transform: none !important;
     }
   }
-
-  .answer-feedback[hidden] {
-    display: none !important;
-  }
 }
