@@ -2,39 +2,67 @@
 
 **Think. Choose. Level Up!**
 
-Permainan kuis edukasi coding untuk anak SD (sekitar usia 8–12 tahun). Proyek ini memperkenalkan konsep dasar Scratch dan computational thinking melalui 20 tantangan interaktif.
+Smart Quiz Challenge adalah media kuis interaktif untuk pembelajaran Informatika siswa SD kelas 1–6. Pemain mengisi nama dan usia, sistem menentukan kelas secara otomatis, lalu pemain memilih materi dan mengerjakan kuis sesuai jenjang.
 
-## Fitur
+## Alur permainan
 
-- Form identitas pemain dengan validasi nama lengkap (minimal dua kata).
-- 20 pertanyaan bertingkat tentang sequencing, Scratch blocks, events, motion, looks, loops, conditions, sprites, stage, costumes, sound, variables, coordinates, debugging, messages, operators, dan control.
-- Empat pilihan jawaban untuk setiap pertanyaan.
-- Umpan balik, petunjuk setelah jawaban salah, dan penjelasan setelah jawaban benar.
-- Skor 100 poin untuk setiap jawaban benar.
-- Bonus streak 25 poin setiap tiga jawaban benar berturut-turut.
-- Peta level, progress bar, skor, jumlah jawaban benar, dan hasil akhir.
-- Navigasi responsif, menu mobile, footer, copyright tahun otomatis, serta favicon SVG.
-- Ilustrasi SVG di `assets/images/` (logo, favicon, maskot, ilustrasi form pemain, piala, dan ikon konsep).
-- Efek hover, transisi, animasi, scroll reveal, dan dukungan `prefers-reduced-motion`.
+1. Masukkan nama lengkap (minimal dua kata).
+2. Masukkan usia antara 6 sampai 12 tahun. Usia dapat dimasukkan dengan satu angka desimal untuk membedakan rentang usia.
+3. Sistem menentukan kelas secara otomatis:
+   - 6 sampai kurang dari 7 tahun: Kelas 1 SD.
+   - 7 sampai kurang dari 8 tahun: Kelas 2 SD.
+   - 8 sampai kurang dari 9 tahun: Kelas 3 SD.
+   - 9 sampai kurang dari 10 tahun: Kelas 4 SD.
+   - 10 sampai kurang dari 11 tahun: Kelas 5 SD.
+   - 11 sampai 12 tahun: Kelas 6 SD.
+4. Pilih salah satu materi yang tersedia untuk kelas tersebut.
+5. Jawab soal pilihan ganda. Setiap soal memiliki maksimal tiga kesempatan.
+6. Setelah semua soal selesai, hasil menampilkan skor, jumlah jawaban benar, dan akurasi.
+7. Pemain dapat mengulang materi, memilih materi lain, atau mengganti pemain.
 
-## Aturan skor
+## Kurikulum dan jumlah soal
 
-- Jawaban benar: **+100 poin**.
-- Setiap tiga jawaban benar berturut-turut: **bonus +25 poin**.
-- Jawaban salah tidak mengurangi skor, tetapi memutus streak.
-- Maksimum jika seluruh jawaban benar tanpa memutus streak: **2.150 poin**.
+| Kelas | Materi                                                                                                                                      | Soal per materi |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------: |
+| 1 SD  | Mengenal TIK; Bagian-Bagian Komputer; Cara Menggunakan Komputer dan Ergonomi; Praktik Dasar Aplikasi                                        |               5 |
+| 2 SD  | Berpikir Komputasional; TIK; Algoritma dan Pemrograman Dasar; Praktik Aplikasi Sederhana                                                    |              10 |
+| 3 SD  | Pengenalan Komputer dan Hardware; Menggambar dan Desain Dasar; Pengenalan Mengetik; Analisis Data Sederhana; Aplikasi Pendukung dan Animasi |              15 |
+| 4 SD  | Berpikir Komputasional; TIK; Penggunaan Aplikasi Perangkat Lunak                                                                            |              20 |
+| 5 SD  | Perangkat Keras dan Perangkat Lunak; Internet dan Jaringan; Aplikasi Perkantoran; Berpikir Komputasional                                    |              25 |
+| 6 SD  | Berpikir Komputasional; TIK; Jaringan Komputer dan Internet                                                                                 |              30 |
+
+Dalam satu putaran lengkap yang mengerjakan seluruh materi pada enam jenjang, pemain akan mengerjakan **385 soal** (20 + 40 + 75 + 60 + 100 + 90). Setiap materi memiliki kumpulan konsep yang menghasilkan variasi soal tentang pengertian/fungsi, contoh penerapan, dan pernyataan yang tepat. Sistem mengacak soal serta pilihan jawaban, tetapi selalu menyajikan jumlah soal sesuai tabel.
+
+### Catatan pemetaan usia
+
+Rentang usia dibuat tidak tumpang tindih agar satu usia hanya menghasilkan satu jenjang. Contoh: usia 7,0 tahun masuk Kelas 2 SD; usia 8,0 tahun masuk Kelas 3 SD; usia 11–12 tahun masuk Kelas 6 SD.
+
+## Aturan pengerjaan dan skor
+
+- Jawaban benar pada kesempatan pertama: **100 poin**.
+- Jawaban benar pada kesempatan kedua: **70 poin**.
+- Jawaban benar pada kesempatan ketiga: **40 poin**.
+- Setiap tiga jawaban benar beruntun yang semuanya benar pada kesempatan pertama mendapat **bonus 25 poin**.
+- Jawaban salah memberi petunjuk dan mengurangi streak.
+- Setelah tiga jawaban salah pada satu soal, jawaban benar dan penjelasannya ditampilkan. Pemain dapat melanjutkan ke soal berikutnya tanpa poin untuk soal tersebut.
+- Skor dan jumlah benar dihitung untuk sesi materi yang sedang dimainkan.
+
+## Perbaikan tampilan mobile
+
+Aturan `.answer-feedback[hidden]` sekarang berlaku secara global sehingga pesan umpan balik tidak tetap terlihat ketika soal baru ditampilkan. JavaScript juga membersihkan judul, isi, dan status feedback setiap kali merender soal baru. Area feedback pada layar sempit dapat membungkus teks panjang tanpa mendorong layout keluar layar.
 
 ## Identitas dan privasi sesi
 
-Nama pemain hanya dipakai selama halaman terbuka. Aplikasi tidak menggunakan database, API, `localStorage`, maupun `sessionStorage`. Refresh halaman akan menghapus nama, level, dan skor sesi, lalu mengembalikan aplikasi ke form nama.
+Nama dan usia hanya digunakan selama sesi browser. Aplikasi tidak memakai database, API, `localStorage`, atau `sessionStorage`. Refresh halaman memulai sesi baru dan menghapus identitas serta skor dari memori halaman.
 
 ## Struktur folder
 
 ```text
-smart-quiz-challenge-v1/
+App_Smart_Quizz_Challenge/
 ├── index.html
 ├── style.css
 ├── script.js
+├── question-bank.js
 ├── README.md
 └── assets/
     └── images/
@@ -52,12 +80,12 @@ smart-quiz-challenge-v1/
 ## Menjalankan secara lokal
 
 1. Ekstrak folder proyek.
-2. Buka folder di Visual Studio Code.
+2. Buka folder proyek di Visual Studio Code.
 3. Jalankan `index.html` melalui Live Server atau buka langsung melalui browser.
-4. Masukkan nama lengkap (minimal dua kata), lalu tekan **Mulai Tantangan**.
-5. Jawab soal satu per satu hingga level 20.
+4. Pastikan `question-bank.js` dan `script.js` berada sejajar dengan `index.html`.
+5. Masukkan nama dan usia, pilih materi, lalu mulai kuis.
 
-Tidak diperlukan build tools, framework, database, atau API. Font Google digunakan sebagai peningkatan visual; jika tidak tersedia, aplikasi tetap menggunakan fallback font sistem.
+Tidak diperlukan build tools, framework, database, atau API. Google Fonts digunakan untuk peningkatan tampilan; jika tidak tersedia, aplikasi tetap memakai font fallback.
 
 ## Copyright
 

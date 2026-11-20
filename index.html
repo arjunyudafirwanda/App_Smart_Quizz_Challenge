@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Smart Quiz Challenge — permainan kuis edukasi coding untuk anak SD. Belajar Scratch, algoritma, urutan instruksi, event, loop, dan logika dengan cara menyenangkan."
+      content="Smart Quiz Challenge — kuis edukasi Informatika untuk siswa SD kelas 1–6. Pelajari TIK, perangkat komputer, berpikir komputasional, aplikasi perkantoran, dan jaringan melalui tantangan interaktif."
     />
     <meta name="author" content="Arjun Yuda Firwanda" />
     <meta name="theme-color" content="#142342" />
@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="style.css" />
     <script>
       // Smart Quiz Challenge tidak menggunakan database atau penyimpanan browser.
-      // Nama pemain, level, dan skor dimulai ulang setiap kali halaman dimuat ulang.
+      // Identitas, usia, materi, jawaban, dan skor hanya berlaku selama sesi halaman.
     </script>
   </head>
 
@@ -63,8 +63,7 @@
           <div class="header-stat level-stat">
             <span class="stat-icon">🎯</span>
             <span class="stat-copy"
-              ><small>LEVEL</small
-              ><strong id="levelNumber">0 / 20</strong></span
+              ><small>SOAL</small><strong id="levelNumber">0 / 0</strong></span
             >
           </div>
           <div class="header-stat score-stat">
@@ -97,19 +96,19 @@
         <div class="hero-grid container">
           <div class="hero-copy reveal">
             <div class="eyebrow">
-              <span class="eyebrow-dot"></span> CODING & COMPUTATIONAL THINKING
-              FOR KIDS
+              <span class="eyebrow-dot"></span> INFORMATIKA & COMPUTATIONAL
+              THINKING FOR KIDS
             </div>
             <h1>Think smart.<br /><span>Play smarter.</span></h1>
             <p class="hero-description">
-              Asah logika, kenali dasar pemrograman, dan pecahkan tantangan
-              coding melalui kuis interaktif yang seru. Satu jawaban benar
-              membawamu selangkah lebih dekat menjadi
-              <strong>Junior Coding Champion!</strong>
+              Kenali teknologi, pahami cara kerja komputer, dan latih kemampuan
+              berpikir komputasional melalui kuis Informatika yang seru. Pilih
+              materi sesuai jenjang kelas dan selesaikan tantangan untuk menjadi
+              <strong>Junior Informatics Champion!</strong>
             </p>
             <div class="hero-pills">
-              <span>🧩 Belajar sambil bermain</span>
-              <span>🚀 20 level tantangan</span>
+              <span>🧩 Materi kelas 1–6 SD</span>
+              <span>🚀 5–30 soal per materi</span>
               <span>⭐ Kumpulkan poin</span>
             </div>
             <a
@@ -119,8 +118,7 @@
               >Mulai Petualangan <span>↗</span></a
             >
             <div class="hero-caption">
-              <span class="caption-line"></span> A FUN WAY TO LEARN THE LOGIC OF
-              CODE
+              <span class="caption-line"></span> A FUN WAY TO LEARN INFORMATICS
             </div>
           </div>
 
@@ -155,11 +153,11 @@
       <section class="challenge-section section-space" id="challengeSection">
         <div class="container">
           <div class="section-heading reveal">
-            <span class="section-kicker">YOUR CODING JOURNEY</span>
+            <span class="section-kicker">YOUR INFORMATICS JOURNEY</span>
             <h2>Ready for the <span>Challenge?</span></h2>
             <p>
-              Kenalkan dirimu terlebih dahulu, lalu mulai perjalanan menjawab 20
-              tantangan coding.
+              Isi identitas dan usia, lalu pilih materi Informatika sesuai
+              kelasmu.
             </p>
           </div>
 
@@ -171,18 +169,18 @@
             <div class="setup-art">
               <img
                 src="assets/images/quiz-welcome.svg"
-                alt="Ilustrasi laptop, puzzle coding, dan bintang"
+                alt="Ilustrasi laptop, pembelajaran digital, dan bintang"
               />
             </div>
             <div class="setup-content">
               <span class="section-kicker">PLAYER REGISTRATION</span>
               <h3 id="setupTitle">
-                Siapa nama <span>jagoan coding</span> hari ini?
+                Siapa nama <span>jagoan Informatika</span> hari ini?
               </h3>
               <p>
-                Masukkan nama lengkap untuk memulai tantangan. Nama hanya
-                digunakan selama sesi bermain dan tidak dikirim atau disimpan ke
-                database.
+                Masukkan nama lengkap dan usia. Sistem akan menentukan jenjang
+                kelas SD secara otomatis, lalu menampilkan pilihan materi yang
+                sesuai dengan usiamu.
               </p>
               <form id="playerForm" novalidate>
                 <label for="playerName">Nama lengkap</label>
@@ -199,15 +197,78 @@
                   />
                 </div>
                 <p class="form-hint">Gunakan minimal dua kata, ya.</p>
+                <label for="playerAge">Usia (tahun)</label>
+                <div class="name-input-wrap age-input-wrap">
+                  <span aria-hidden="true">🎂</span>
+                  <input
+                    id="playerAge"
+                    name="playerAge"
+                    type="number"
+                    inputmode="decimal"
+                    min="6"
+                    max="12"
+                    step="0.1"
+                    placeholder="Contoh: 8"
+                    required
+                  />
+                </div>
+                <p class="form-hint">
+                  Pemetaan usia: 6–&lt;7 = Kelas 1, 7–&lt;8 = Kelas 2, 8–&lt;9 =
+                  Kelas 3, 9–&lt;10 = Kelas 4, 10–&lt;11 = Kelas 5, dan 11–12 =
+                  Kelas 6.
+                </p>
                 <p class="form-error" id="nameError" role="alert"></p>
                 <button class="button button-primary button-wide" type="submit">
-                  Mulai Tantangan <span>→</span>
+                  Lihat Pilihan Materi <span>→</span>
                 </button>
               </form>
               <div class="privacy-note">
-                <span>🔒</span> Tanpa akun, tanpa database. Refresh halaman akan
-                mengulang level dan skor dari awal.
+                <span>🔒</span> Data nama dan usia hanya digunakan selama sesi
+                bermain dan tidak dikirim ke server.
               </div>
+            </div>
+          </section>
+
+          <section
+            class="material-selection panel hidden"
+            id="materialSelection"
+            aria-labelledby="materialSelectionTitle"
+          >
+            <div class="material-selection-top">
+              <div>
+                <span class="section-kicker">PILIH MATERI BELAJAR</span>
+                <h3 id="materialSelectionTitle">
+                  Materi Informatika <span>Kelas 1 SD</span>
+                </h3>
+                <p id="materialSelectionDescription">
+                  Pilih salah satu materi untuk memulai kuis.
+                </p>
+              </div>
+              <div class="grade-summary" id="gradeSummary">
+                <span class="grade-summary-icon">🎓</span>
+                <span
+                  ><small>JENJANG OTOMATIS</small
+                  ><strong id="gradeSummaryText">Kelas 1 SD</strong></span
+                >
+              </div>
+            </div>
+            <div
+              class="material-grid"
+              id="materialGrid"
+              aria-live="polite"
+            ></div>
+            <div class="material-selection-actions">
+              <span class="material-selection-note"
+                >Setiap materi memiliki jumlah soal dan tantangan sesuai jenjang
+                kelas.</span
+              >
+              <button
+                class="button button-outline"
+                id="editPlayerBtn"
+                type="button"
+              >
+                ← Ubah nama / usia
+              </button>
             </div>
           </section>
 
@@ -220,23 +281,37 @@
               <div class="quiz-board panel" id="quizBoard" tabindex="-1">
                 <div class="quiz-board-top">
                   <div>
-                    <span class="section-kicker">SMART QUIZ ARENA</span>
+                    <span class="section-kicker" id="quizSectionKicker"
+                      >SMART QUIZ ARENA</span
+                    >
                     <h3>
                       Let's solve it, <span id="quizPlayerName">Champion</span>!
                     </h3>
+                    <p class="quiz-grade-line" id="quizGradeLine">
+                      Kelas 1 SD · Materi Informatika
+                    </p>
                   </div>
-                  <button
-                    class="text-button"
-                    id="changePlayerBtn"
-                    type="button"
-                  >
-                    Ganti pemain ↗
-                  </button>
+                  <div class="quiz-top-actions">
+                    <button
+                      class="text-button"
+                      id="changeMaterialBtn"
+                      type="button"
+                    >
+                      Pilih materi ↗
+                    </button>
+                    <button
+                      class="text-button"
+                      id="changePlayerBtn"
+                      type="button"
+                    >
+                      Ganti pemain ↗
+                    </button>
+                  </div>
                 </div>
 
                 <div class="question-progress-wrap">
                   <div class="question-progress-label">
-                    <span id="questionProgressText">LEVEL 01 OF 20</span
+                    <span id="questionProgressText">SOAL 01 DARI 05</span
                     ><strong id="questionProgressPercent">5%</strong>
                   </div>
                   <div class="progress-track">
@@ -246,12 +321,12 @@
 
                 <div class="question-meta">
                   <span class="topic-tag" id="questionCategory"
-                    >BASIC CODING</span
+                    >INFORMATIKA</span
                   >
                   <span class="difficulty-tag" id="questionDifficulty"
                     >EASY</span
                   >
-                  <span class="points-tag">+100 PTS</span>
+                  <span class="points-tag">MAKS. 100 PTS</span>
                 </div>
 
                 <div class="question-content">
@@ -326,16 +401,16 @@
                 <h3>
                   Outstanding work, <span id="resultPlayerName">Champion</span>!
                 </h3>
-                <p class="result-description">
-                  Kamu sudah menyelesaikan seluruh 20 tantangan Smart Quiz
-                  Challenge. Terus belajar dan jadilah pemikir yang hebat!
+                <p class="result-description" id="resultDescription">
+                  Kamu sudah menyelesaikan materi ini. Terus belajar dan jadilah
+                  pemikir yang hebat!
                 </p>
                 <div class="result-stats">
                   <div>
                     <strong id="finalScore">0</strong><span>TOTAL POIN</span>
                   </div>
                   <div>
-                    <strong id="finalCorrect">0 / 20</strong
+                    <strong id="finalCorrect">0 / 0</strong
                     ><span>JAWABAN BENAR</span>
                   </div>
                   <div>
@@ -352,6 +427,13 @@
                   </button>
                   <button
                     class="button button-outline"
+                    id="selectMaterialBtn"
+                    type="button"
+                  >
+                    Pilih Materi Lain
+                  </button>
+                  <button
+                    class="button button-outline"
                     id="newPlayerBtn"
                     type="button"
                   >
@@ -359,8 +441,8 @@
                   </button>
                 </div>
                 <p class="session-note">
-                  Hasil ini hanya tersedia selama sesi browser saat ini. Refresh
-                  halaman akan memulai sesi baru.
+                  Hasil tersedia selama sesi browser saat ini. Refresh halaman
+                  akan menghapus nama, usia, progres, dan skor sesi.
                 </p>
               </div>
             </div>
@@ -369,7 +451,7 @@
               <div class="player-card panel">
                 <div class="player-avatar">🧑‍💻</div>
                 <div class="player-card-copy">
-                  <small>CODING CHAMPION</small
+                  <small>INFORMATIKA CHAMPION</small
                   ><strong id="sidebarPlayerName">Pemain</strong
                   ><span id="streakText">Ayo mulai tantanganmu!</span>
                 </div>
@@ -389,7 +471,7 @@
                 <div class="score-divider"></div>
                 <div class="score-detail">
                   <span>Jawaban benar</span
-                  ><strong id="correctCount">0 / 20</strong>
+                  ><strong id="correctCount">0 / 0</strong>
                 </div>
                 <div class="score-detail">
                   <span>Bonus streak</span
@@ -402,13 +484,13 @@
                   <span>🗺️</span>
                   <div>
                     <strong>Peta Tantangan</strong
-                    ><small>20 level perjalananmu</small>
+                    ><small id="levelMapCaption">Progres materi</small>
                   </div>
                 </div>
                 <div
                   class="level-dots"
                   id="levelDots"
-                  aria-label="Peta 20 level"
+                  aria-label="Peta soal dalam materi"
                 ></div>
                 <div class="map-legend">
                   <span><i class="dot-complete"></i> Selesai</span
@@ -436,55 +518,55 @@
         <div class="container">
           <div class="section-heading reveal">
             <span class="section-kicker">LEARN THE BASICS</span>
-            <h2>Kenali Dunia <span>Coding!</span></h2>
+            <h2>Jelajahi Dunia <span>Informatika!</span></h2>
             <p>
-              Beberapa konsep dasar yang akan kamu temui sepanjang perjalanan
-              Smart Quiz Challenge.
+              Pelajari teknologi, cara berpikir komputasional, aplikasi digital,
+              serta jaringan dan keamanan informasi sesuai jenjang kelas.
             </p>
           </div>
           <div class="concept-grid">
             <article class="concept-card reveal">
               <div class="concept-icon icon-sequence">
-                <img src="assets/images/icon-sequence.svg" alt="" />
+                <span aria-hidden="true">🧠</span>
               </div>
               <span class="concept-number">01</span>
-              <h3>Sequencing</h3>
+              <h3>Berpikir Komputasional</h3>
               <p>
-                Menyusun langkah atau instruksi secara berurutan agar program
-                berjalan sesuai tujuan.
+                Menyelesaikan masalah melalui algoritma, dekomposisi, pengenalan
+                pola, dan abstraksi.
               </p>
             </article>
             <article class="concept-card reveal reveal-delay-1">
               <div class="concept-icon icon-events">
-                <img src="assets/images/icon-events.svg" alt="" />
+                <span aria-hidden="true">🖥️</span>
               </div>
               <span class="concept-number">02</span>
-              <h3>Events</h3>
+              <h3>Teknologi dan Komputer</h3>
               <p>
-                Memahami peristiwa yang membuat sebuah program mulai menjalankan
-                perintah.
+                Mengenal perangkat keras, perangkat lunak, brainware, dan cara
+                menggunakan teknologi secara bijak.
               </p>
             </article>
             <article class="concept-card reveal reveal-delay-2">
               <div class="concept-icon icon-loops">
-                <img src="assets/images/icon-loops.svg" alt="" />
+                <span aria-hidden="true">📊</span>
               </div>
               <span class="concept-number">03</span>
-              <h3>Loops</h3>
+              <h3>Aplikasi Digital</h3>
               <p>
-                Menggunakan pengulangan agar instruksi yang sama dapat
-                dijalankan beberapa kali.
+                Menggunakan aplikasi menggambar, pengolah kata, spreadsheet, dan
+                presentasi untuk berkarya.
               </p>
             </article>
             <article class="concept-card reveal reveal-delay-3">
               <div class="concept-icon icon-conditions">
-                <img src="assets/images/icon-conditions.svg" alt="" />
+                <span aria-hidden="true">🌐</span>
               </div>
               <span class="concept-number">04</span>
-              <h3>Conditions</h3>
+              <h3>Jaringan dan Data</h3>
               <p>
-                Menggunakan kondisi untuk menentukan tindakan yang dilakukan
-                program.
+                Memahami internet, jaringan komputer, pengolahan data, privasi,
+                dan keamanan informasi.
               </p>
             </article>
           </div>
@@ -502,29 +584,29 @@
               <div class="how-step">
                 <span>1</span>
                 <div>
-                  <strong>Isi nama lengkap</strong
-                  ><small>Kenalkan dirimu sebelum bermain.</small>
+                  <strong>Isi nama dan usia</strong
+                  ><small>Sistem menentukan kelas berdasarkan usia.</small>
                 </div>
               </div>
               <div class="how-step">
                 <span>2</span>
                 <div>
-                  <strong>Baca pertanyaan</strong
-                  ><small>Perhatikan topik dan pilihan jawaban.</small>
+                  <strong>Pilih materi</strong
+                  ><small>Pilih topik Informatika dari kelasmu.</small>
                 </div>
               </div>
               <div class="how-step">
                 <span>3</span>
                 <div>
-                  <strong>Pilih jawaban</strong
-                  ><small>Jawaban benar mendapatkan poin.</small>
+                  <strong>Jawab soal</strong
+                  ><small>Pilih jawaban yang paling tepat.</small>
                 </div>
               </div>
               <div class="how-step">
                 <span>4</span>
                 <div>
-                  <strong>Naik level</strong
-                  ><small>Selesaikan 20 tantangan sampai akhir.</small>
+                  <strong>Selesaikan materi</strong
+                  ><small>Kerjakan 5–30 soal sesuai jenjang.</small>
                 </div>
               </div>
             </div>
@@ -542,8 +624,8 @@
           ></a
         >
         <p>
-          Media pembelajaran coding interaktif untuk mengasah logika dan
-          computational thinking anak.
+          Media pembelajaran Informatika interaktif untuk mengasah logika,
+          literasi digital, dan computational thinking siswa SD.
         </p>
         <a href="#home" class="back-top">Kembali ke atas ↑</a>
       </div>
@@ -557,6 +639,7 @@
       </div>
     </footer>
 
+    <script src="question-bank.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
