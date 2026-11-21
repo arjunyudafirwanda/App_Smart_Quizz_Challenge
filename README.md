@@ -2,6 +2,10 @@
 
 **Think. Choose. Level Up!**
 
+## Update v2.2
+
+Setelah nama dan usia dimasukkan, pemain selalu diarahkan ke halaman pilihan materi. Aplikasi tidak lagi otomatis membuka materi terakhir. Riwayat setiap materi tetap tersimpan dan dipulihkan setelah pemain memilih kartu materi terkait.
+
 ## Update v2.1
 
 Versi ini menambahkan penyimpanan otomatis profil pemain dan progres per materi. Saat pemain kembali menggunakan nama yang sama, aplikasi akan melanjutkan materi terakhir yang sedang dikerjakan. Materi lain juga memiliki sesi terpisah. Persentase progres hanya menghitung soal yang sudah diselesaikan, dan ukuran huruf utama pada area kuis diperbesar agar lebih mudah dibaca.
@@ -61,7 +65,7 @@ Aturan `.answer-feedback[hidden]` sekarang berlaku secara global sehingga pesan 
 
 Aplikasi menyimpan profil pemain dan progres setiap materi menggunakan `localStorage` pada browser/perangkat yang digunakan. Identitas pemain dibuat dari nama lengkap yang dinormalisasi (tidak membedakan huruf besar-kecil). Setiap pemain memiliki data kelas, daftar materi, bank soal yang sudah diacak, nomor soal terakhir, jawaban yang sudah dicoba, status feedback, skor, streak, dan bonus masing-masing.
 
-- Saat pemain berganti, sesi aktif disimpan otomatis. Ketika nama pemain yang sama dimasukkan kembali, aplikasi melanjutkan materi terakhir pada nomor soal yang tersimpan.
+- Saat pemain berganti, sesi aktif disimpan otomatis. Ketika nama pemain yang sama dimasukkan kembali, aplikasi menampilkan daftar pilihan materi terlebih dahulu. Pemain memilih materi yang ingin dilanjutkan; aplikasi kemudian memulihkan nomor soal dan sesi terakhir pada materi tersebut.
 - Setiap materi memiliki sesi tersendiri. Berpindah materi tidak menghapus atau mengulang progres materi sebelumnya. Saat materi dibuka kembali, sesi terakhirnya dilanjutkan.
 - Progres disimpan setelah setiap jawaban, saat berpindah soal, saat berpindah materi/pemain, serta ketika halaman disembunyikan atau ditutup.
 - Tombol **Main Lagi** memulai sesi baru untuk materi yang sudah selesai. Ringkasan hasil sebelumnya disimpan dalam riwayat internal profil lokal.

@@ -838,23 +838,6 @@
     }
   }
 
-  function findLastActiveMaterial() {
-    if (
-      !state.profile ||
-      state.profile.lastActiveGrade !== state.grade ||
-      !state.profile.lastActiveMaterialId
-    )
-      return null;
-    const gradeData = getGradeData(state.grade);
-    const material = gradeData.materials.find(
-      (item) => item.id === state.profile.lastActiveMaterialId,
-    );
-    const record = material
-      ? getMaterialRecord(material.id, state.grade, false)
-      : null;
-    return record && record.session ? material : null;
-  }
-
   function returnToSetup(clearFields = false) {
     saveCurrentSession();
     resetRuntimeSession();
@@ -924,12 +907,7 @@
     writePlayerStore();
     $("headerPlayer").textContent = fullName;
 
-    const lastMaterial = findLastActiveMaterial();
-    if (lastMaterial) {
-      startMaterial(lastMaterial.id);
-    } else {
-      showMaterialSelection();
-    }
+    showMaterialSelection();
   });
 
   materialGrid.addEventListener("click", (event) => {
