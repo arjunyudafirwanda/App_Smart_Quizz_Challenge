@@ -2,6 +2,12 @@
 
 **Think. Choose. Level Up!**
 
+## Update v2.1
+
+Versi ini menambahkan penyimpanan otomatis profil pemain dan progres per materi. Saat pemain kembali menggunakan nama yang sama, aplikasi akan melanjutkan materi terakhir yang sedang dikerjakan. Materi lain juga memiliki sesi terpisah. Persentase progres hanya menghitung soal yang sudah diselesaikan, dan ukuran huruf utama pada area kuis diperbesar agar lebih mudah dibaca.
+
+**Catatan migrasi:** versi 2.0 belum menyimpan progres ke browser. Karena itu, riwayat sesi yang dikerjakan di versi 2.0 tidak dapat dipulihkan secara otomatis. Penyimpanan otomatis berlaku mulai versi 2.1.
+
 Smart Quiz Challenge adalah media kuis interaktif untuk pembelajaran Informatika siswa SD kelas 1–6. Pemain mengisi nama dan usia, sistem menentukan kelas secara otomatis, lalu pemain memilih materi dan mengerjakan kuis sesuai jenjang.
 
 ## Alur permainan
@@ -51,9 +57,19 @@ Rentang usia dibuat tidak tumpang tindih agar satu usia hanya menghasilkan satu 
 
 Aturan `.answer-feedback[hidden]` sekarang berlaku secara global sehingga pesan umpan balik tidak tetap terlihat ketika soal baru ditampilkan. JavaScript juga membersihkan judul, isi, dan status feedback setiap kali merender soal baru. Area feedback pada layar sempit dapat membungkus teks panjang tanpa mendorong layout keluar layar.
 
-## Identitas dan privasi sesi
+## Penyimpanan profil dan riwayat pengerjaan
 
-Nama dan usia hanya digunakan selama sesi browser. Aplikasi tidak memakai database, API, `localStorage`, atau `sessionStorage`. Refresh halaman memulai sesi baru dan menghapus identitas serta skor dari memori halaman.
+Aplikasi menyimpan profil pemain dan progres setiap materi menggunakan `localStorage` pada browser/perangkat yang digunakan. Identitas pemain dibuat dari nama lengkap yang dinormalisasi (tidak membedakan huruf besar-kecil). Setiap pemain memiliki data kelas, daftar materi, bank soal yang sudah diacak, nomor soal terakhir, jawaban yang sudah dicoba, status feedback, skor, streak, dan bonus masing-masing.
+
+- Saat pemain berganti, sesi aktif disimpan otomatis. Ketika nama pemain yang sama dimasukkan kembali, aplikasi melanjutkan materi terakhir pada nomor soal yang tersimpan.
+- Setiap materi memiliki sesi tersendiri. Berpindah materi tidak menghapus atau mengulang progres materi sebelumnya. Saat materi dibuka kembali, sesi terakhirnya dilanjutkan.
+- Progres disimpan setelah setiap jawaban, saat berpindah soal, saat berpindah materi/pemain, serta ketika halaman disembunyikan atau ditutup.
+- Tombol **Main Lagi** memulai sesi baru untuk materi yang sudah selesai. Ringkasan hasil sebelumnya disimpan dalam riwayat internal profil lokal.
+- Data hanya tersimpan pada browser dan perangkat yang sama. Data tidak dikirim ke server dan tidak otomatis tersinkron ke perangkat lain. Menghapus data situs/browser dapat menghapus seluruh riwayat pemain.
+
+## Progress soal
+
+Persentase menunjukkan jumlah soal yang sudah diselesaikan, bukan nomor soal yang sedang dibuka. Pada soal pertama, progres tetap `0%` sampai soal dijawab benar atau kesempatan menjawabnya habis. Setelah soal pertama selesai dan pemain berpindah ke soal kedua, progres akan bertambah sesuai jumlah soal yang telah diselesaikan.
 
 ## Struktur folder
 

@@ -5,35 +5,6 @@
   const curriculum = window.SMART_QUIZ_CURRICULUM || [];
   const letters = ["A", "B", "C", "D"];
 
-  const state = {
-    player: "",
-    age: null,
-    grade: null,
-    currentMaterial: null,
-    questions: [],
-    current: 0,
-    score: 0,
-    correct: 0,
-    streak: 0,
-    bonus: 0,
-    attempts: 0,
-    answered: false,
-    finished: false,
-  };
-
-  const playerForm = $("playerForm");
-  const playerInput = $("playerName");
-  const ageInput = $("playerAge");
-  const setupPanel = $("playerSetup");
-  const materialPanel = $("materialSelection");
-  const materialGrid = $("materialGrid");
-  const quizPanel = $("quizPanel");
-  const quizBoard = $("quizBoard");
-  const resultPanel = $("resultPanel");
-  const answerGrid = $("answerGrid");
-  const feedback = $("answerFeedback");
-  const nextButton = $("nextQuestionBtn");
-
   const fallbackAnswers = {
     meaning: [
       "alat untuk menyimpan makanan dan minuman",
@@ -125,9 +96,6 @@
       }),
     );
 
-    // Ambil satu variasi dari setiap konsep terlebih dahulu agar satu sesi
-    // mencakup materi yang lebih beragam. Jika soal masih kurang, tambahkan
-    // variasi pertanyaan lain dari konsep-konsep tersebut.
     const firstRound = shuffle(questionsByFact).map((variants) => {
       const chosenIndex = Math.floor(Math.random() * variants.length);
       const [chosen] = variants.splice(chosenIndex, 1);
@@ -144,7 +112,6 @@
   }
 
   function gradeFromAge(age) {
-    // Rentang tidak tumpang tindih: 6–<7 = kelas 1, 7–<8 = kelas 2, dst.
     return Math.min(6, Math.max(1, Math.floor(age) - 5));
   }
 
@@ -158,6 +125,247 @@
         .trim()
         .split(/\s+/)[0] || "Champion"
     );
+  }
+
+  const STORAGE_KEY = "smart-quiz-challenge-player-progress-v3";
+
+  const state = {
+    player: "",
+    profileKey: null,
+    profile: null,
+    age: null,
+    grade: null,
+    currentMaterial: null,
+    questions: [],
+    questionStates: [],
+    current: 0,
+    score: 0,
+    correct: 0,
+    streak: 0,
+    bonus: 0,
+    attempts: 0,
+    answered: false,
+    finished: false,
+  };
+
+  const playerForm = $("playerForm");
+  const playerInput = $("playerName");
+  const ageInput = $("playerAge");
+  const setupPanel = $("playerSetup");
+  const materialPanel = $("materialSelection");
+  const materialGrid = $("materialGrid");
+  const quizPanel = $("quizPanel");
+  const quizBoard = $("quizBoard");
+  const resultPanel = $("resultPanel");
+  const answerGrid = $("answerGrid");
+  const feedback = $("answerFeedback");
+  const nextButton = $("nextQuestionBtn");
+
+  let playerStore = readPlayerStore();
+
+  function readPlayerStore() {
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      if (!raw) return { version: 3, players: {} };
+      const parsed = JSON.parse(raw);
+      if (
+        !parsed ||
+        typeof parsed !== "object" ||
+        !parsed.players ||
+        typeof parsed.players !== "object"
+      ) {
+        return { version: 3, players: {} };
+      }
+      return { version: 3, players: parsed.players };
+    } catch (error) {
+      console.warn("Riwayat pemain tidak dapat dibaca dari browser.", error);
+      return { version: 3, players: {} };
+    }
+  }
+
+  function writePlayerStore() {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(playerStore));
+      return true;
+    } catch (error) {
+      console.warn("Riwayat pemain belum dapat disimpan di browser.", error);
+      return false;
+    }
+  }
+
+  function normalizePlayerKey(name) {
+    return String(name || "")
+      .trim()
+      .replace(/\s+/g, " ")
+      .toLocaleLowerCase("id-ID");
+  }
+
+  function createPlayerProfile(name, age, grade) {
+    return {
+      name,
+      age,
+      grade,
+      gradeProgress: {},
+      lastActiveMaterialId: null,
+      lastActiveGrade: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  function getGradeProgress(
+    profile = state.profile,
+    grade = state.grade,
+    create = false,
+  ) {
+    if (!profile || !grade) return null;
+    profile.gradeProgress ||= {};
+    const key = String(grade);
+    if (!profile.gradeProgress[key] && create) {
+      profile.gradeProgress[key] = { materials: {} };
+    }
+    const bucket = profile.gradeProgress[key] || null;
+    if (bucket && create) bucket.materials ||= {};
+    return bucket;
+  }
+
+  function getMaterialRecord(materialId, grade = state.grade, create = false) {
+    const bucket = getGradeProgress(state.profile, grade, create);
+    if (!bucket) return null;
+    bucket.materials ||= {};
+    if (!bucket.materials[materialId] && create) {
+      bucket.materials[materialId] = { session: null, history: [] };
+    }
+    return bucket.materials[materialId] || null;
+  }
+
+  function makeQuestionState() {
+    return {
+      attempts: 0,
+      wrongIndices: [],
+      completed: false,
+      outcome: null,
+      selectedIndex: null,
+      earnedPoints: 0,
+      bonusAwarded: 0,
+    };
+  }
+
+  function normalizeQuestionStates(saved, total) {
+    return Array.from({ length: total }, (_, index) => {
+      const item =
+        saved && saved[index] && typeof saved[index] === "object"
+          ? saved[index]
+          : {};
+      return {
+        attempts: Math.max(0, Math.min(3, Number(item.attempts) || 0)),
+        wrongIndices: Array.isArray(item.wrongIndices)
+          ? [
+              ...new Set(
+                item.wrongIndices
+                  .map(Number)
+                  .filter(
+                    (value) =>
+                      Number.isInteger(value) && value >= 0 && value <= 3,
+                  ),
+              ),
+            ]
+          : [],
+        completed: Boolean(item.completed),
+        outcome:
+          item.outcome === "correct" || item.outcome === "failed"
+            ? item.outcome
+            : null,
+        selectedIndex: Number.isInteger(item.selectedIndex)
+          ? item.selectedIndex
+          : null,
+        earnedPoints: Math.max(0, Number(item.earnedPoints) || 0),
+        bonusAwarded: Math.max(0, Number(item.bonusAwarded) || 0),
+      };
+    });
+  }
+
+  function completedQuestionCount() {
+    return state.questionStates.filter((item) => item && item.completed).length;
+  }
+
+  function saveCurrentSession() {
+    if (
+      !state.profile ||
+      !state.currentMaterial ||
+      !state.questions.length ||
+      !state.profileKey
+    )
+      return;
+
+    const record = getMaterialRecord(
+      state.currentMaterial.id,
+      state.grade,
+      true,
+    );
+    record.session = {
+      materialId: state.currentMaterial.id,
+      grade: state.grade,
+      questions: state.questions,
+      questionStates: state.questionStates,
+      current: state.current,
+      score: state.score,
+      correct: state.correct,
+      streak: state.streak,
+      bonus: state.bonus,
+      finished: state.finished,
+      updatedAt: new Date().toISOString(),
+    };
+    state.profile.lastActiveMaterialId = state.currentMaterial.id;
+    state.profile.lastActiveGrade = state.grade;
+    state.profile.updatedAt = new Date().toISOString();
+    writePlayerStore();
+  }
+
+  function restoreSession(session, material) {
+    if (
+      !session ||
+      !Array.isArray(session.questions) ||
+      session.questions.length !== material.count
+    ) {
+      return false;
+    }
+    const validQuestions = session.questions.every(
+      (question) =>
+        question &&
+        typeof question.prompt === "string" &&
+        Array.isArray(question.answers) &&
+        question.answers.length === 4 &&
+        Number.isInteger(question.correct) &&
+        question.correct >= 0 &&
+        question.correct < 4,
+    );
+    if (!validQuestions) return false;
+
+    state.currentMaterial = material;
+    state.questions = session.questions;
+    state.questionStates = normalizeQuestionStates(
+      session.questionStates,
+      state.questions.length,
+    );
+    state.current = Math.max(
+      0,
+      Math.min(Number(session.current) || 0, state.questions.length),
+    );
+    state.score = Math.max(0, Number(session.score) || 0);
+    state.correct = Math.max(0, Number(session.correct) || 0);
+    state.streak = Math.max(0, Number(session.streak) || 0);
+    state.bonus = Math.max(0, Number(session.bonus) || 0);
+    state.finished = Boolean(session.finished);
+
+    if (!state.finished && state.current >= state.questions.length) {
+      state.current = Math.max(0, state.questions.length - 1);
+    }
+    const currentQuestionState =
+      state.questionStates[state.current] || makeQuestionState();
+    state.attempts = currentQuestionState.attempts;
+    state.answered = currentQuestionState.completed;
+    return true;
   }
 
   function scrollToElement(element) {
@@ -180,8 +388,11 @@
   function updateHeader() {
     $("headerPlayer").textContent = state.player || "Tamu";
     const total = state.questions.length;
+    const questionNumber = state.finished
+      ? total
+      : Math.min(state.current + 1, total);
     $("levelNumber").textContent = total
-      ? `${Math.min(state.current + 1, total)} / ${total}`
+      ? `${questionNumber} / ${total}`
       : "0 / 0";
     $("totalScore").textContent = state.score.toLocaleString("id-ID");
     $("sidebarScore").textContent = state.score.toLocaleString("id-ID");
@@ -193,25 +404,35 @@
         : "Terus semangat belajar!";
   }
 
+  function updateQuestionProgress() {
+    const total = state.questions.length;
+    const done = completedQuestionCount();
+    const percentage = total ? Math.round((done / total) * 100) : 0;
+    $("questionProgressPercent").textContent = `${percentage}%`;
+    $("questionProgressBar").style.width = `${percentage}%`;
+  }
+
   function renderLevelMap() {
     const map = $("levelDots");
     map.innerHTML = "";
     state.questions.forEach((_, index) => {
       const dot = document.createElement("span");
+      const response = state.questionStates[index];
+      const isCompleted = Boolean(response && response.completed);
+      const isCurrent = index === state.current && !state.finished;
       dot.className = "level-dot";
       dot.textContent = index + 1;
-      if (index < state.current) dot.classList.add("completed");
-      if (index === state.current && !state.finished)
-        dot.classList.add("current");
+      if (isCompleted) dot.classList.add("completed");
+      if (isCurrent) dot.classList.add("current");
       dot.setAttribute(
         "aria-label",
-        `Soal ${index + 1}${index < state.current ? ", selesai" : index === state.current ? ", aktif" : ", berikutnya"}`,
+        `Soal ${index + 1}${isCompleted ? ", selesai" : isCurrent ? ", aktif" : ", berikutnya"}`,
       );
       map.appendChild(dot);
     });
     map.setAttribute("aria-label", `Peta ${state.questions.length} soal`);
     $("levelMapCaption").textContent =
-      `${state.questions.length} soal dalam materi ini`;
+      `${completedQuestionCount()} dari ${state.questions.length} soal selesai`;
   }
 
   function resetFeedback() {
@@ -222,6 +443,75 @@
     $("feedbackText").textContent = "";
   }
 
+  function setNextButtonState() {
+    nextButton.disabled = !state.answered;
+    nextButton.innerHTML =
+      state.current === state.questions.length - 1
+        ? `Lihat Hasil <span>→</span>`
+        : `Soal Berikutnya <span>→</span>`;
+  }
+
+  function restoreCurrentQuestionFeedback(question, response) {
+    const buttons = [...answerGrid.querySelectorAll("button")];
+    response.wrongIndices.forEach((index) => {
+      if (buttons[index]) {
+        buttons[index].classList.add("wrong");
+        buttons[index].disabled = true;
+      }
+    });
+
+    if (!response.completed && response.attempts > 0) {
+      feedback.hidden = false;
+      feedback.classList.add("is-incorrect");
+      $("feedbackSymbol").textContent = "💪";
+      $("feedbackTitle").textContent = "Belum tepat. Coba lagi!";
+      $("feedbackText").textContent = question.hint;
+      $("attemptNote").textContent =
+        `Percobaan ${response.attempts} dari 3. Kamu masih memiliki ${3 - response.attempts} kesempatan.`;
+      return;
+    }
+
+    if (!response.completed) {
+      $("attemptNote").textContent = "Pilih jawabanmu dengan teliti.";
+      return;
+    }
+
+    buttons.forEach((button) => {
+      button.disabled = true;
+    });
+    if (response.outcome === "correct") {
+      if (buttons[question.correct])
+        buttons[question.correct].classList.add("correct");
+      feedback.hidden = false;
+      feedback.classList.remove("is-incorrect");
+      $("feedbackSymbol").textContent = response.bonusAwarded > 0 ? "🏆" : "✨";
+      $("feedbackTitle").textContent =
+        response.bonusAwarded > 0
+          ? `Hebat! Bonus streak +${response.bonusAwarded} poin!`
+          : response.attempts === 1
+            ? "Jawaban benar pada percobaan pertama!"
+            : `Berhasil pada percobaan ke-${response.attempts}!`;
+      $("feedbackText").textContent = question.explanation;
+      $("attemptNote").textContent =
+        `+${response.earnedPoints} poin` +
+        (response.bonusAwarded > 0
+          ? ` + ${response.bonusAwarded} bonus streak!`
+          : "");
+    } else {
+      if (buttons[question.correct])
+        buttons[question.correct].classList.add("correct");
+      feedback.hidden = false;
+      feedback.classList.add("is-incorrect");
+      $("feedbackSymbol").textContent = "📘";
+      $("feedbackTitle").textContent =
+        "Kesempatan selesai. Yuk, pelajari jawabannya!";
+      $("feedbackText").textContent =
+        `Jawaban yang benar adalah ${letters[question.correct]}. ${question.answers[question.correct]}. ${question.explanation}`;
+      $("attemptNote").textContent =
+        "Kamu sudah menggunakan 3 kesempatan. Soal ini mendapatkan 0 poin.";
+    }
+  }
+
   function renderQuestion() {
     if (state.current >= state.questions.length) {
       showResults();
@@ -229,8 +519,10 @@
     }
 
     const question = state.questions[state.current];
-    state.answered = false;
-    state.attempts = 0;
+    const response = state.questionStates[state.current] || makeQuestionState();
+    state.questionStates[state.current] = response;
+    state.attempts = response.attempts;
+    state.answered = response.completed;
     resetFeedback();
 
     $("questionCategory").textContent = question.category;
@@ -244,14 +536,8 @@
     $("questionPrompt").textContent = "Pilih satu jawaban yang paling tepat.";
     $("questionProgressText").textContent =
       `SOAL ${String(state.current + 1).padStart(2, "0")} DARI ${String(state.questions.length).padStart(2, "0")}`;
-    const percentage = Math.round(
-      ((state.current + 1) / state.questions.length) * 100,
-    );
-    $("questionProgressPercent").textContent = `${percentage}%`;
-    $("questionProgressBar").style.width = `${percentage}%`;
-    nextButton.disabled = true;
-    nextButton.innerHTML = `Soal Berikutnya <span>→</span>`;
-    $("attemptNote").textContent = "Pilih jawabanmu dengan teliti.";
+    updateQuestionProgress();
+    setNextButtonState();
 
     answerGrid.innerHTML = "";
     question.answers.forEach((answer, index) => {
@@ -268,6 +554,7 @@
       answerGrid.appendChild(button);
     });
 
+    restoreCurrentQuestionFeedback(question, response);
     $("quizPlayerName").textContent = firstName(state.player);
     $("quizGradeLine").textContent =
       `${getGradeData(state.grade).title} · ${state.currentMaterial.title}`;
@@ -277,16 +564,21 @@
 
   function updateAfterAnswer() {
     updateHeader();
+    updateQuestionProgress();
     renderLevelMap();
+    saveCurrentSession();
   }
 
   function chooseAnswer(index, selectedButton) {
     if (state.answered || selectedButton.disabled) return;
     const question = state.questions[state.current];
-    state.attempts += 1;
+    const response = state.questionStates[state.current];
+    response.attempts += 1;
+    state.attempts = response.attempts;
 
     if (index !== question.correct) {
       state.streak = 0;
+      response.wrongIndices = [...new Set([...response.wrongIndices, index])];
       selectedButton.classList.add("wrong");
       selectedButton.disabled = true;
       feedback.hidden = false;
@@ -295,7 +587,9 @@
       $("feedbackTitle").textContent = "Belum tepat. Coba lagi!";
       $("feedbackText").textContent = question.hint;
 
-      if (state.attempts >= 3) {
+      if (response.attempts >= 3) {
+        response.completed = true;
+        response.outcome = "failed";
         state.answered = true;
         const answerButtons = [...answerGrid.querySelectorAll("button")];
         answerButtons.forEach((button, buttonIndex) => {
@@ -310,28 +604,28 @@
           `${question.answers[question.correct]}. ${question.explanation}`;
         $("attemptNote").textContent =
           "Kamu sudah menggunakan 3 kesempatan. Soal ini mendapatkan 0 poin.";
-        nextButton.disabled = false;
-        nextButton.innerHTML =
-          state.current === state.questions.length - 1
-            ? `Lihat Hasil <span>→</span>`
-            : `Soal Berikutnya <span>→</span>`;
+        setNextButtonState();
         updateAfterAnswer();
         return;
       }
 
       $("attemptNote").textContent =
-        `Percobaan ${state.attempts} dari 3. Kamu masih memiliki ${3 - state.attempts} kesempatan.`;
+        `Percobaan ${response.attempts} dari 3. Kamu masih memiliki ${3 - response.attempts} kesempatan.`;
       updateAfterAnswer();
       return;
     }
 
+    response.completed = true;
+    response.outcome = "correct";
+    response.selectedIndex = index;
     state.answered = true;
     state.correct += 1;
     const pointsByAttempt = { 1: 100, 2: 70, 3: 40 };
-    const earnedPoints = pointsByAttempt[state.attempts];
+    const earnedPoints = pointsByAttempt[response.attempts];
+    response.earnedPoints = earnedPoints;
     state.score += earnedPoints;
 
-    if (state.attempts === 1) state.streak += 1;
+    if (response.attempts === 1) state.streak += 1;
     else state.streak = 0;
 
     let bonusAwarded = 0;
@@ -340,6 +634,7 @@
       state.bonus += bonusAwarded;
       state.score += bonusAwarded;
     }
+    response.bonusAwarded = bonusAwarded;
 
     const answerButtons = [...answerGrid.querySelectorAll("button")];
     answerButtons.forEach((button, buttonIndex) => {
@@ -352,24 +647,20 @@
     feedback.classList.remove("is-incorrect");
     $("feedbackSymbol").textContent = bonusAwarded > 0 ? "🏆" : "✨";
     $("feedbackTitle").textContent =
-      state.attempts === 1
+      response.attempts === 1
         ? bonusAwarded > 0
           ? `Hebat! Bonus streak +${bonusAwarded} poin!`
           : "Jawaban benar pada percobaan pertama!"
-        : `Berhasil pada percobaan ke-${state.attempts}!`;
+        : `Berhasil pada percobaan ke-${response.attempts}!`;
     $("feedbackText").textContent = question.explanation;
     $("attemptNote").textContent =
       `+${earnedPoints} poin` +
       (bonusAwarded > 0 ? ` + ${bonusAwarded} bonus streak!` : "");
-    nextButton.disabled = false;
-    nextButton.innerHTML =
-      state.current === state.questions.length - 1
-        ? `Lihat Hasil <span>→</span>`
-        : `Soal Berikutnya <span>→</span>`;
+    setNextButtonState();
     updateAfterAnswer();
   }
 
-  function showResults() {
+  function showResults(shouldScroll = true) {
     state.finished = true;
     quizBoard.classList.add("hidden");
     resultPanel.classList.remove("hidden");
@@ -380,12 +671,13 @@
     $("finalAccuracy").textContent =
       `${Math.round((state.correct / state.questions.length) * 100)}%`;
     $("resultDescription").textContent =
-      `Kamu telah menyelesaikan ${state.questions.length} soal pada materi ${state.currentMaterial.title} untuk ${getGradeData(state.grade).title}. Terus berlatih dan jelajahi materi lainnya!`;
+      `Kamu telah menyelesaikan ${state.questions.length} soal pada materi ${state.currentMaterial.title} untuk ${getGradeData(state.grade).title}. Progres materi ini sudah tersimpan. Terus berlatih dan jelajahi materi lainnya!`;
     $("levelNumber").textContent =
       `${state.questions.length} / ${state.questions.length}`;
     updateHeader();
     renderLevelMap();
-    scrollToElement(resultPanel);
+    saveCurrentSession();
+    if (shouldScroll) scrollToElement(resultPanel);
   }
 
   function renderMaterials() {
@@ -393,7 +685,7 @@
     $("materialSelectionTitle").innerHTML =
       `Materi Informatika <span>${gradeData.title}</span>`;
     $("materialSelectionDescription").textContent =
-      `Usia ${String(state.age).replace(".", ",")} tahun · ${gradeData.materials.length} pilihan materi. Pilih satu materi untuk mulai bermain.`;
+      `Usia ${String(state.age).replace(".", ",")} tahun · ${gradeData.materials.length} pilihan materi. Setiap materi menyimpan progres pemain secara terpisah.`;
     $("gradeSummaryText").textContent = gradeData.title;
     materialGrid.innerHTML = "";
 
@@ -416,7 +708,34 @@
       copy.append(title, description);
       const meta = document.createElement("span");
       meta.className = "material-card-meta";
-      meta.innerHTML = `<strong>${material.count}</strong><small>SOAL</small>`;
+      const total = document.createElement("strong");
+      total.textContent = material.count;
+      const totalLabel = document.createElement("small");
+      totalLabel.textContent = "SOAL";
+      meta.append(total, totalLabel);
+
+      const record = getMaterialRecord(material.id, state.grade, false);
+      const session = record && record.session;
+      if (session && Array.isArray(session.questionStates)) {
+        const done = session.questionStates.filter(
+          (item) => item && item.completed,
+        ).length;
+        const progress = document.createElement("small");
+        progress.className = "material-progress";
+        progress.textContent = session.finished
+          ? "SELESAI"
+          : `${done}/${material.count} SELESAI`;
+        meta.append(progress);
+        button.classList.add(
+          session.finished ? "has-completed" : "has-progress",
+        );
+      } else {
+        const progress = document.createElement("small");
+        progress.className = "material-progress";
+        progress.textContent = "BELUM MULAI";
+        meta.append(progress);
+      }
+
       const arrow = document.createElement("span");
       arrow.className = "material-card-arrow";
       arrow.textContent = "→";
@@ -425,10 +744,10 @@
     });
   }
 
-  function showMaterialSelection() {
-    // Setiap kali kembali ke daftar materi, sesi materi sebelumnya diakhiri.
+  function resetRuntimeSession() {
     state.currentMaterial = null;
     state.questions = [];
+    state.questionStates = [];
     state.current = 0;
     state.score = 0;
     state.correct = 0;
@@ -437,6 +756,11 @@
     state.attempts = 0;
     state.answered = false;
     state.finished = false;
+  }
+
+  function showMaterialSelection() {
+    saveCurrentSession();
+    resetRuntimeSession();
     setupPanel.classList.add("hidden");
     quizPanel.classList.add("hidden");
     materialPanel.classList.remove("hidden");
@@ -448,22 +772,55 @@
     scrollToElement(materialPanel);
   }
 
-  function startMaterial(materialId) {
+  function archiveCompletedSession(record) {
+    if (!record || !record.session || !record.session.finished) return;
+    record.history ||= [];
+    const session = record.session;
+    record.history.push({
+      completedAt: session.updatedAt || new Date().toISOString(),
+      score: Number(session.score) || 0,
+      correct: Number(session.correct) || 0,
+      total: Array.isArray(session.questions) ? session.questions.length : 0,
+      accuracy:
+        Array.isArray(session.questions) && session.questions.length
+          ? Math.round(
+              ((Number(session.correct) || 0) / session.questions.length) * 100,
+            )
+          : 0,
+    });
+    record.history = record.history.slice(-20);
+  }
+
+  function startMaterial(materialId, forceNew = false) {
     const gradeData = getGradeData(state.grade);
     const material = gradeData.materials.find((item) => item.id === materialId);
-    if (!material) return;
+    if (!material || !state.profile) return;
 
-    state.currentMaterial = material;
-    state.questions = makeQuestionSet(material, state.grade);
-    state.current = 0;
-    state.score = 0;
-    state.correct = 0;
-    state.streak = 0;
-    state.bonus = 0;
-    state.attempts = 0;
-    state.answered = false;
-    state.finished = false;
+    saveCurrentSession();
+    const record = getMaterialRecord(material.id, state.grade, true);
+    let restored = false;
+    if (!forceNew && record.session) {
+      restored = restoreSession(record.session, material);
+    }
 
+    if (!restored) {
+      if (forceNew) archiveCompletedSession(record);
+      const questions = makeQuestionSet(material, state.grade);
+      state.currentMaterial = material;
+      state.questions = questions;
+      state.questionStates = questions.map(() => makeQuestionState());
+      state.current = 0;
+      state.score = 0;
+      state.correct = 0;
+      state.streak = 0;
+      state.bonus = 0;
+      state.attempts = 0;
+      state.answered = false;
+      state.finished = false;
+    }
+
+    state.profile.lastActiveMaterialId = material.id;
+    state.profile.lastActiveGrade = state.grade;
     materialPanel.classList.add("hidden");
     setupPanel.classList.add("hidden");
     quizPanel.classList.remove("hidden");
@@ -471,33 +828,54 @@
     quizBoard.classList.remove("hidden");
     $("sidebarPlayerName").textContent = state.player;
     $("gradeSummaryText").textContent = gradeData.title;
-    renderQuestion();
-    scrollToElement(quizBoard);
+
+    if (state.finished) {
+      showResults();
+    } else {
+      renderQuestion();
+      saveCurrentSession();
+      scrollToElement(quizBoard);
+    }
+  }
+
+  function findLastActiveMaterial() {
+    if (
+      !state.profile ||
+      state.profile.lastActiveGrade !== state.grade ||
+      !state.profile.lastActiveMaterialId
+    )
+      return null;
+    const gradeData = getGradeData(state.grade);
+    const material = gradeData.materials.find(
+      (item) => item.id === state.profile.lastActiveMaterialId,
+    );
+    const record = material
+      ? getMaterialRecord(material.id, state.grade, false)
+      : null;
+    return record && record.session ? material : null;
   }
 
   function returnToSetup(clearFields = false) {
-    state.currentMaterial = null;
-    state.questions = [];
-    state.current = 0;
-    state.score = 0;
-    state.correct = 0;
-    state.streak = 0;
-    state.bonus = 0;
-    state.attempts = 0;
-    state.answered = false;
-    state.finished = false;
+    saveCurrentSession();
+    resetRuntimeSession();
     quizPanel.classList.add("hidden");
     materialPanel.classList.add("hidden");
     resultPanel.classList.add("hidden");
     quizBoard.classList.remove("hidden");
     setupPanel.classList.remove("hidden");
+
     if (clearFields) {
       playerInput.value = "";
       ageInput.value = "";
       state.player = "";
+      state.profileKey = null;
+      state.profile = null;
       state.age = null;
       state.grade = null;
       $("nameError").textContent = "";
+    } else {
+      playerInput.value = state.player;
+      ageInput.value = state.age == null ? "" : state.age;
     }
     updateHeader();
     scrollToElement(setupPanel);
@@ -533,8 +911,25 @@
     state.player = fullName;
     state.age = Math.round(age * 10) / 10;
     state.grade = gradeFromAge(state.age);
+    state.profileKey = normalizePlayerKey(fullName);
+    state.profile = playerStore.players[state.profileKey] || null;
+    if (!state.profile) {
+      state.profile = createPlayerProfile(fullName, state.age, state.grade);
+      playerStore.players[state.profileKey] = state.profile;
+    }
+    state.profile.name = fullName;
+    state.profile.age = state.age;
+    state.profile.grade = state.grade;
+    state.profile.updatedAt = new Date().toISOString();
+    writePlayerStore();
     $("headerPlayer").textContent = fullName;
-    showMaterialSelection();
+
+    const lastMaterial = findLastActiveMaterial();
+    if (lastMaterial) {
+      startMaterial(lastMaterial.id);
+    } else {
+      showMaterialSelection();
+    }
   });
 
   materialGrid.addEventListener("click", (event) => {
@@ -546,25 +941,24 @@
   nextButton.addEventListener("click", () => {
     if (!state.answered) return;
     state.current += 1;
-    if (state.current >= state.questions.length) showResults();
-    else {
+    if (state.current >= state.questions.length) {
+      showResults();
+    } else {
+      state.attempts = 0;
+      state.answered = false;
+      saveCurrentSession();
       renderQuestion();
       scrollToElement(quizBoard);
     }
   });
 
-  $("changePlayerBtn").addEventListener("click", () => returnToSetup(false));
+  $("changePlayerBtn").addEventListener("click", () => returnToSetup(true));
   $("newPlayerBtn").addEventListener("click", () => returnToSetup(true));
   $("playAgainBtn").addEventListener("click", () => {
-    if (state.currentMaterial) startMaterial(state.currentMaterial.id);
+    if (state.currentMaterial) startMaterial(state.currentMaterial.id, true);
   });
   $("selectMaterialBtn").addEventListener("click", showMaterialSelection);
-  $("changeMaterialBtn").addEventListener("click", () => {
-    const confirmed = window.confirm(
-      "Kembali ke pilihan materi? Progres kuis pada materi yang sedang berjalan akan diulang jika kamu membukanya lagi.",
-    );
-    if (confirmed) showMaterialSelection();
-  });
+  $("changeMaterialBtn").addEventListener("click", showMaterialSelection);
   $("editPlayerBtn").addEventListener("click", () => returnToSetup(false));
 
   $("heroStartLink").addEventListener("click", (event) => {
@@ -644,7 +1038,13 @@
     revealElements.forEach((element) => element.classList.add("is-visible"));
   }
 
+  window.addEventListener("beforeunload", saveCurrentSession);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") saveCurrentSession();
+  });
+
   $("currentYear").textContent = new Date().getFullYear();
   updateHeader();
+  updateQuestionProgress();
   renderLevelMap();
 })();

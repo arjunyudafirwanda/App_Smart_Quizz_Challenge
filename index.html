@@ -19,8 +19,8 @@
     />
     <link rel="stylesheet" href="style.css" />
     <script>
-      // Smart Quiz Challenge tidak menggunakan database atau penyimpanan browser.
-      // Identitas, usia, materi, jawaban, dan skor hanya berlaku selama sesi halaman.
+      // Profil dan progres disimpan secara lokal di browser masing-masing perangkat.
+      // Data tidak dikirim ke server dan tidak disinkronkan antarperangkat.
     </script>
   </head>
 
@@ -223,8 +223,9 @@
                 </button>
               </form>
               <div class="privacy-note">
-                <span>🔒</span> Data nama dan usia hanya digunakan selama sesi
-                bermain dan tidak dikirim ke server.
+                <span>🔒</span> Nama, usia, skor, dan progres tersimpan di
+                browser ini agar setiap pemain dapat melanjutkan kuisnya. Data
+                tidak dikirim ke server.
               </div>
             </div>
           </section>
@@ -312,7 +313,7 @@
                 <div class="question-progress-wrap">
                   <div class="question-progress-label">
                     <span id="questionProgressText">SOAL 01 DARI 05</span
-                    ><strong id="questionProgressPercent">5%</strong>
+                    ><strong id="questionProgressPercent">0%</strong>
                   </div>
                   <div class="progress-track">
                     <span id="questionProgressBar"></span>
@@ -441,8 +442,8 @@
                   </button>
                 </div>
                 <p class="session-note">
-                  Hasil tersedia selama sesi browser saat ini. Refresh halaman
-                  akan menghapus nama, usia, progres, dan skor sesi.
+                  Hasil dan progres materi tersimpan otomatis di browser ini.
+                  Gunakan browser dan perangkat yang sama untuk melanjutkan.
                 </p>
               </div>
             </div>
